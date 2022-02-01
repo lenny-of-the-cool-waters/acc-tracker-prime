@@ -31,12 +31,12 @@ app.use(session({
 }))
 
 // ROUTING
-const deviceRouter = require('./routes/Devices');
+/* const deviceRouter = require('./routes/Devices');
 const userRouter = require('./routes/Users');
 const keysRouter = require('./routes/Keys');
 app.use('/devices', deviceRouter);
 app.use('/auth', userRouter);
-app.use('/apis', keysRouter);
+app.use('/apis', keysRouter); */
 
 // INITIALIZING THE DATABASE
 dotenv.config();
@@ -51,9 +51,51 @@ db.connect((err) => {
         return console.error(`Error: ${err.message}`);
     }
 
-    let createTable = `create table if not exists acc_tracker_prime(
-        id 
+    // Queries for creating tables
+    let createAPIKeys = `CREATE TABLE IF NOT EXISTS APIKeys (
+        KeyID varchar(255) NOT NULL,
+        KeyName varchar(255),
+        KeyIV varchar(255),
+        PRIMARY KEY (KeyID)
     )`;
+    let createUsers = `CREATE TABLE IF NOT EXISTS Users (
+        UserID varchar(255) NOT NULL,
+        Username varchar(255),
+        Password varchar(255),
+        UserRole int,
+        Email varchar(255),
+        PhoneNum varchar(255),
+        PRIMARY KEY (UserID),
+        CHECK (UserRole >= 1 AND UserRole <=3)
+    )`;
+    let createDevices = `CREATE TABLE IF NOT EXISTS Devices (
+        ID int NOT NULL,
+        ChannelNum varchar(255),
+        NumberPlate varchar(255),
+        MemberName varchar(255),
+        PolicyNum varchar(255),
+        UserID varchar(255),
+        PRIMARY KEY (ID),
+        FOREIGN KEY (UserID) REFERENCES Users(UserID)
+    )`;
+
+    
+
+    // Creating tables
+    db.query(createAPIKeys, (err, results, fields) => {
+        if(err) return console.log(err.message)
+    })
+    db.query(createUsers, (err, results, fields) => {
+        if(err) return console.log(err.message)
+    })
+    db.query(createDevices, (err, results, fields) => {
+        if(err) return console.log(err.message)
+    })
+
+    // End connection to DB
+    db.end((err) => {
+        if(err) return console.log(err.message)
+    })
 
     console.log("Connected to MySQL server.")
 })
