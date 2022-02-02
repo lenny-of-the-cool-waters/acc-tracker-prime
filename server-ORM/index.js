@@ -48,10 +48,10 @@ db.sequelize.sync()
     if(!superAdmin) {
         bcrypt.hash("Password01!", 13).then((hash) => {
             db.Users.create({
-                id: "2",
+                id: "1",
                 username: "SuperAdmin",
                 password: hash,
-                userRole: "3",
+                userRole: "super",
                 email: "lennygith@gmail.com"
             })
         })

@@ -29,6 +29,7 @@ app.use(session({
         expires: 60*60*24
     }
 }))
+app.listen(port, () => console.log(`Server listening on port ${port}`))
 
 // ROUTING
 /* const deviceRouter = require('./routes/Devices');
@@ -53,31 +54,52 @@ db.connect((err) => {
 
     // Queries for creating tables
     let createAPIKeys = `CREATE TABLE IF NOT EXISTS APIKeys (
-        KeyID varchar(255) NOT NULL,
-        KeyName varchar(255),
-        KeyIV varchar(255),
+        ApiID int INCREMENT NOT NULL,
+        Name varchar(255),
+        Api varchar(255),
+        IV varchar(255),
         PRIMARY KEY (KeyID)
     )`;
     let createUsers = `CREATE TABLE IF NOT EXISTS Users (
-        UserID varchar(255) NOT NULL,
+        UserID int INCREMENT NOT NULL,
         Username varchar(255),
         Password varchar(255),
-        UserRole int,
+        Role int,
         Email varchar(255),
         PhoneNum varchar(255),
         PRIMARY KEY (UserID),
         CHECK (UserRole >= 1 AND UserRole <=3)
     )`;
     let createDevices = `CREATE TABLE IF NOT EXISTS Devices (
-        ID int NOT NULL,
+        DeviceID int INCREMENT NOT NULL,
         ChannelNum varchar(255),
         NumberPlate varchar(255),
         MemberName varchar(255),
         PolicyNum varchar(255),
         UserID varchar(255),
-        PRIMARY KEY (ID),
+        PRIMARY KEY (DeviceID),
         FOREIGN KEY (UserID) REFERENCES Users(UserID)
     )`;
+    let createTicketCreation = `CREATE TABLE IF NOT EXISTS TicketCreation (
+        TicketID int INCREMENT NOT NULL,
+        CreatedBy varchar(255),
+        CreationTime timestamp,
+        lat FLOAT( 10, 6 ),  
+        lng FLOAT( 10, 6 ),
+        PRIMARY KEY (TicketID)
+    )`;
+    let createTicketAssignment = `CREATE TABLE IF NOT EXISTS TicketAssignment (
+        AssignmentID int INCREMENT NOT NULL,
+        AssignedBy int,
+        AssignedTo int,
+        AssignmentTime timestamp,
+        ClosingTime timestamp,
+        Turnaround TIMESTAMPDIFF(MINUTE, AssignmentTime, ClosingTime),
+        AssignmentAlert int,
+        PRIMARY KEY (AssignmentID),
+        FOREIGN KEY (TicketID) REFERENCES TicketCreation(TicketID)
+    )`;
+    
 
     
 
@@ -89,6 +111,12 @@ db.connect((err) => {
         if(err) return console.log(err.message)
     })
     db.query(createDevices, (err, results, fields) => {
+        if(err) return console.log(err.message)
+    })
+    db.query(createTicketCreation, (err, results, fields) => {
+        if(err) return console.log(err.message)
+    })
+    db.query(createTicketAssignment, (err, results, fields) => {
         if(err) return console.log(err.message)
     })
 
