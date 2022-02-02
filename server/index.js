@@ -68,6 +68,7 @@ db.connect((err) => {
         Email varchar(255),
         PhoneNum varchar(255),
         PRIMARY KEY (UserID),
+        FOREIGN KEY (DeviceID) REFERENCES Devices(DeviceID),
         CHECK (UserRole >= 1 AND UserRole <=3)
     )`;
     let createDevices = `CREATE TABLE IF NOT EXISTS Devices (
@@ -77,8 +78,7 @@ db.connect((err) => {
         MemberName varchar(255),
         PolicyNum varchar(255),
         UserID varchar(255),
-        PRIMARY KEY (DeviceID),
-        FOREIGN KEY (UserID) REFERENCES Users(UserID)
+        PRIMARY KEY (DeviceID)
     )`;
     let createTicketCreation = `CREATE TABLE IF NOT EXISTS TicketCreation (
         TicketID int INCREMENT NOT NULL,
@@ -86,7 +86,8 @@ db.connect((err) => {
         CreationTime timestamp,
         lat FLOAT( 10, 6 ),  
         lng FLOAT( 10, 6 ),
-        PRIMARY KEY (TicketID)
+        PRIMARY KEY (TicketID),
+        FOREIGN KEY (AssignmentID) REFERENCES TicketAssignment(AssignmentID)
     )`;
     let createTicketAssignment = `CREATE TABLE IF NOT EXISTS TicketAssignment (
         AssignmentID int INCREMENT NOT NULL,
@@ -96,8 +97,7 @@ db.connect((err) => {
         ClosingTime timestamp,
         Turnaround TIMESTAMPDIFF(MINUTE, AssignmentTime, ClosingTime),
         AssignmentAlert int,
-        PRIMARY KEY (AssignmentID),
-        FOREIGN KEY (TicketID) REFERENCES TicketCreation(TicketID)
+        PRIMARY KEY (AssignmentID)
     )`;
     
 
